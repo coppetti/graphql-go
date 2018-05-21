@@ -3,24 +3,23 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/coppetti/graphql-go/data"
 
 	"github.com/graphql-go/graphql"
 )
 
-type Song data.Song
-type Artist data.Artist
-type Album data.Album
+type Transaction data.Transaction
+type Input data.Input
+type Output data.Output
 
-var songs = data.Songs
-var artists = data.Artists
-var albums = data.Albums
+var tx = data.Transactions
+var txi = data.Inputs
+var txo = data.Outputs
 
-func Filter(songs []data.Song, f func(data.Song) bool) []data.Song {
-	vsf := make([]data.Song, 0)
-	for _, v := range songs {
+func Filter(tx []data.Transaction, f func(data.Transaction) bool) []data.Transaction {
+	vsf := make([]data.Transaction, 0)
+	for _, v := range tx {
 		if f(v) {
 			vsf = append(vsf, v)
 		}
@@ -29,59 +28,66 @@ func Filter(songs []data.Song, f func(data.Song) bool) []data.Song {
 }
 
 func main() {
-	songType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Song",
+
+	txiType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Input",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
+			"hash": &graphql.Field{
 				Type: graphql.String,
 			},
-			"album": &graphql.Field{
+			"n": &graphql.Field{
 				Type: graphql.String,
 			},
-			"title": &graphql.Field{
-				Type: graphql.String,
-			},
-			"duration": &graphql.Field{
+			"scriptsig": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
 	})
 
-	artistType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Artist",
+	txoType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Output",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
+			"hash": &graphql.Field{
 				Type: graphql.String,
 			},
-			"name": &graphql.Field{
+			"n": &graphql.Field{
 				Type: graphql.String,
 			},
-			"type": &graphql.Field{
+			"scriptpubkey": &graphql.Field{
+				Type: graphql.String,
+			},
+			"value": &graphql.Field{
+				Type: graphql.String,
+			},
+			"address": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
 	})
 
-	albumType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Album",
+	txType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Transaction",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
+			"hash": &graphql.Field{
 				Type: graphql.String,
 			},
-			"artist": &graphql.Field{
+			"ver": &graphql.Field{
 				Type: graphql.String,
 			},
-			"title": &graphql.Field{
+			"block": &graphql.Field{
 				Type: graphql.String,
 			},
-			"year": &graphql.Field{
+			"blocknumber": &graphql.Field{
 				Type: graphql.String,
 			},
-			"genre": &graphql.Field{
+			"time": &graphql.Field{
 				Type: graphql.String,
 			},
-			"type": &graphql.Field{
-				Type: graphql.String,
+			"inputs": &graphql.Field{
+				Type: txiType,
+			},
+			"outputs": &graphql.Field{
+				Type: txoType,
 			},
 		},
 	})
@@ -89,50 +95,52 @@ func main() {
 	rootQuery := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
-			"songs": &graphql.Field{
-				Type: graphql.NewList(songType),
+			"input": &graphql.Field{
+				Type: txiType,
 				Args: graphql.FieldConfigArgument{
-					"album": &graphql.ArgumentConfig{
+					"hash": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					album := params.Args["album"].(string)
-					filtered := Filter(songs, func(v data.Song) bool {
-						return strings.Contains(v.Album, album)
-					})
-					return filtered, nil
-				},
-			},
-			"album": &graphql.Field{
-				Type: albumType,
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
-				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					id := params.Args["id"].(string)
-					for _, album := range albums {
-						if album.ID == id {
-							return album, nil
+					hash := params.Args["hash"].(string)
+					for _, t := range txi {
+						if t.Hash == hash {
+							return t, nil
 						}
 					}
 					return nil, nil
 				},
 			},
-			"artist": &graphql.Field{
-				Type: graphql.NewList(artistType),
+			"output": &graphql.Field{
+				Type: txoType,
 				Args: graphql.FieldConfigArgument{
-					"name": &graphql.ArgumentConfig{
+					"hash": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					name := params.Args["name"].(string)
-					for _, artist := range artists {
-						if artist.Name == name {
-							return artist, nil
+					hash := params.Args["hash"].(string)
+					for _, t := range txo {
+						if t.Hash == hash {
+							return t, nil
+						}
+					}
+					return nil, nil
+				},
+			},
+			"transaction": &graphql.Field{
+				Type: txType,
+				Args: graphql.FieldConfigArgument{
+					"hash": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					hash := params.Args["hash"].(string)
+					for _, t := range tx {
+						if t.Hash == hash {
+							return t, nil
 						}
 					}
 					return nil, nil

@@ -1,27 +1,32 @@
 package data
 
-// Album Structure
-type Album struct {
-	ID     string `json:"id,omitempty"`
-	Artist string `json:"artist"`
-	Title  string `json:"title"`
-	Year   string `json:"year"`
-	Genre  string `json:"genre"`
-	Type   string `json:"type"`
+// Transaction Structure
+type Transaction struct {
+	Hash        string   `json:"hash"`
+	Ver         string   `json:"ver"`
+	VinSz       string   `json:"vinsz"`
+	VoutSz      string   `json:"voutsz"`
+	Locktime    string   `json:"locktime"`
+	Size        string   `json:"size"`
+	Block       string   `json:"block"`
+	Blocknumber string   `json:"blocknumber"`
+	Time        string   `json:"timer"`
+	Inputs      []Input  `json:"inputs"`
+	Outputs     []Output `json:"outputs"`
 }
 
-// Artist structure
-type Artist struct {
-	ID   string `json:"id,omitempty"`
-	Name string `json:"name"`
-	Type string `json:"type"`
+// Input structure
+type Input struct {
+	Hash      string `json:"hash"`
+	N         string `json:"n"`
+	ScriptSig string `json:"scriptsig"`
 }
 
-// Song structure
-type Song struct {
-	ID       string `json:"id,omitempty"`
-	Album    string `json:"album"`
-	Title    string `json:"title"`
-	Duration string `json:"duration"`
-	Type     string `json:"type"`
+// Output Structure
+type Output struct {
+	Value        string `json:"value"`
+	ScriptPubKey string `json:"scriptpubkey"`
+	Address      string `json:"address"`
+	Hash         string `json:"hash"`
+	N            string `json:"n"`
 }
