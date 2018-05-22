@@ -85,7 +85,7 @@ func createTxType(txiType *graphql.Object, txoType *graphql.Object) (*graphql.Ob
 			},
 			"inputs": &graphql.Field{
 				Type: graphql.String,
-				// graphql.NewList(txiType),
+				// Type: graphql.NewList(txiType),
 				// Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				// 	if tx, ok := p.Source.(Transaction); ok {
 				// 		return tx.Inputs, nil
@@ -95,10 +95,10 @@ func createTxType(txiType *graphql.Object, txoType *graphql.Object) (*graphql.Ob
 			},
 			"outputs": &graphql.Field{
 				Type: graphql.String,
-				// graphql.NewList(txoType),
+				// Type: graphql.NewList(txoType),
 				// Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				// 	if tx, ok := p.Source.(Transaction); ok {
-				// 		return tx.Inputs, nil
+				// 		return tx.Outputs, nil
 				// 	}
 				// 	return []interface{}{}, nil
 				// },
@@ -194,6 +194,7 @@ func serveGraphQL(s graphql.Schema) http.HandlerFunc {
 		res := graphql.Do(graphql.Params{
 			Schema:        s,
 			RequestString: req.Query,
+			// RequestString: r.URL.Query().Get("query"), // to use with ?query={...}
 		})
 
 		if err := json.NewEncoder(w).Encode(res); err != nil {
