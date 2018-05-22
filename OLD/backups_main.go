@@ -212,6 +212,20 @@ func main() {
 		Query: rootQuery,
 	})
 
+	// http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+	// 	result := graphql.Do(graphql.Params{
+	// 		Schema:        schema,
+	// 		RequestString: r.URL.Query().Get("query"),
+	// 	})
+	// 	json.NewEncoder(w).Encode(result)
+	// })
+
+	// http.HandleFunc("/", graphiql.ServeGraphiQL)
+
+	// log.Println("Server started at http://localhost:12345/graphql")
+
+	// http.ListenAndServe(":12345", nil)
+
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: graphql.NewObject(
 			createQuery(
@@ -225,7 +239,13 @@ func main() {
 
 	http.HandleFunc("/", graphiql.ServeGraphiQL)
 	http.HandleFunc("/graphql", serveGraphQL(schema))
-
+	// http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+	// 	result := graphql.Do(graphql.Params{
+	// 		Schema:        schema,
+	// 		RequestString: r.URL.Query().Get("query"),
+	// 	})
+	// 	json.NewEncoder(w).Encode(result)
+	// })
 	log.Println("Server started at http://localhost:3000/graphql")
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
