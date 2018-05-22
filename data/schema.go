@@ -11,8 +11,8 @@ type Transaction struct {
 	Block       string   `json:"block"`
 	Blocknumber string   `json:"blocknumber"`
 	Time        string   `json:"timer"`
-	Inputs      []Input  `json:"inputs"`
-	Outputs     []Output `json:"outputs"`
+	Txi         []Input  `json:"inputs"`
+	Txo         []Output `json:"outputs"`
 }
 
 // Input structure

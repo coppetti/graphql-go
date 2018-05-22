@@ -84,24 +84,22 @@ func createTxType(txiType *graphql.Object, txoType *graphql.Object) (*graphql.Ob
 				Type: graphql.String,
 			},
 			"inputs": &graphql.Field{
-				Type: graphql.String,
-				// Type: graphql.NewList(txiType),
-				// Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				// 	if tx, ok := p.Source.(Transaction); ok {
-				// 		return tx.Inputs, nil
-				// 	}
-				// 	return []interface{}{}, nil
-				// },
+				Type: graphql.NewList(txiType),
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if tx, ok := p.Source.(data.Transaction); ok {
+						return tx.Txi, nil
+					}
+					return []interface{}{}, nil
+				},
 			},
 			"outputs": &graphql.Field{
-				Type: graphql.String,
-				// Type: graphql.NewList(txoType),
-				// Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				// 	if tx, ok := p.Source.(Transaction); ok {
-				// 		return tx.Outputs, nil
-				// 	}
-				// 	return []interface{}{}, nil
-				// },
+				Type: graphql.NewList(txoType),
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if tx, ok := p.Source.(data.Transaction); ok {
+						return tx.Txo, nil
+					}
+					return []interface{}{}, nil
+				},
 			},
 		},
 	}), txiType, txoType
@@ -230,3 +228,24 @@ func main() {
 	log.Println("Server started at http://localhost:3000/graphql")
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
+
+// Query example
+// {
+// 	transaction(hash:"f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16"){
+// 	  inputs{
+// 		hash
+// 		n
+// 		scriptsig
+// 	  }
+// 	  outputs{
+// 		value
+// 		address
+// 		scriptpubkey
+// 		hash
+// 		n
+// 	  }
+// 	  block
+// 	  blocknumber
+// 	  time
+// 	}
+//   }
