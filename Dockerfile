@@ -1,20 +1,39 @@
-# Start from a Debian image with the latest version of Go installed
-# and a workspace (GOPATH) configured at /go.
-FROM golang
+FROM golang:onbuild
 
-# Copy the local package files to the container's workspace.
-ADD . /go/src/github.com/coppetti/graphql-go
-
-# Build the outyet command inside the container.
-# (You may fetch or manage dependencies here,
-# either manually or with a tool like "godep".)
 RUN go get github.com/mnmtanish/go-graphiql
 RUN go get github.com/graphql-go/graphql
 
-RUN go install github.com/coppetti/graphql-go
+WORKDIR /go/src/github.com/coppetti/graphql-go/graphql-go
 
-# Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/graphql-go
+RUN git clone https://github.com/coppetti/graphql-go.git .
 
-# Document that the service listens on port 3000.
+RUN go build -o main .
+
+CMD ["./main"]
+
 EXPOSE 3000
+
+
+# Running
+# docker run -p 3000:3000 <image id>
+
+# Sample Query
+# {
+# 	transaction(hash:"f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16"){
+# 	  inputs{
+# 		hash
+# 		n
+# 		scriptsig
+# 	  }
+# 	  outputs{
+# 		value
+# 		address
+# 		scriptpubkey
+# 		hash
+# 		n
+# 	  }
+# 	  block
+# 	  blocknumber
+# 	  time
+# 	}
+#   }
